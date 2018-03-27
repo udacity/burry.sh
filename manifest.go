@@ -84,7 +84,7 @@ func extractS3cred() (accessKeyID, secretAccessKey, bucketName, prefix string) {
 			bucketName = p.Value
 		}
 		if p.Key == "PREFIX" {
-			bucketName = p.Value
+			prefix = p.Value
 		}
 	}
 	return accessKeyID, secretAccessKey, bucketName, prefix
