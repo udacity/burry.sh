@@ -72,7 +72,7 @@ func parsecred() Credentials {
 
 // extractS3cred tries to extract AWS access key and secret
 // from an already parsed cred string
-func extractS3cred() (accessKeyID string, secretAccessKey string) {
+func extractS3cred() (accessKeyID, secretAccessKey, bucketName string) {
 	for _, p := range brf.Creds.Params {
 		if p.Key == "ACCESS_KEY_ID" {
 			accessKeyID = p.Value
@@ -80,8 +80,11 @@ func extractS3cred() (accessKeyID string, secretAccessKey string) {
 		if p.Key == "SECRET_ACCESS_KEY" {
 			secretAccessKey = p.Value
 		}
+		if p.Key == "BUCKET_NAME" {
+			bucketName = p.Value
+		}
 	}
-	return accessKeyID, secretAccessKey
+	return accessKeyID, secretAccessKey, bucketName
 }
 
 // loadbf tries to load a JSON representation of the burry manifest

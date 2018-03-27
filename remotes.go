@@ -30,10 +30,12 @@ func toremoteS3(localarch string) {
 		_ = os.Remove(localarch)
 	}()
 	endpoint := brf.Creds.StorageTargetEndpoint
-	accessKeyID, secretAccessKey := extractS3cred()
+	accessKeyID, secretAccessKey, bucket := extractS3cred()
 	useSSL := true
 	_, f := filepath.Split(localarch)
-	bucket := brf.InfraService + "-backup"
+	if bucket == "" {
+		bucket = brf.InfraService + "-backup"
+	}
 	object := strings.TrimSuffix(f, filepath.Ext(f))
 
 	log.WithFields(log.Fields{"func": "toremoteS3"}).Debug(fmt.Sprintf("Trying to back up to %s/%s in S3 compatible remote storage", bucket, object))
@@ -79,9 +81,11 @@ func fromremoteS3() string {
 	cwd, _ := os.Getwd()
 	localarch := filepath.Join(cwd, based+".zip")
 	endpoint := brf.Creds.StorageTargetEndpoint
-	accessKeyID, secretAccessKey := extractS3cred()
+	accessKeyID, secretAccessKey, bucket := extractS3cred()
 	useSSL := true
-	bucket := brf.InfraService + "-backup"
+	if bucket == "" {
+		bucket = brf.InfraService + "-backup"
+	}
 	object := snapshotid
 
 	log.WithFields(log.Fields{"func": "fromremoteS3"}).Debug(fmt.Sprintf("Trying to retrieve %s/%s from S3 compatible remote storage", bucket, object))
