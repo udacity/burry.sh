@@ -30,13 +30,13 @@ func toremoteS3(localarch string) {
 		_ = os.Remove(localarch)
 	}()
 	endpoint := brf.Creds.StorageTargetEndpoint
-	accessKeyID, secretAccessKey, bucket := extractS3cred()
+	accessKeyID, secretAccessKey, bucket, prefix := extractS3cred()
 	useSSL := true
 	_, f := filepath.Split(localarch)
 	if bucket == "" {
 		bucket = brf.InfraService + "-backup"
 	}
-	object := strings.TrimSuffix(f, filepath.Ext(f))
+	object := prefix + strings.TrimSuffix(f, filepath.Ext(f))
 
 	log.WithFields(log.Fields{"func": "toremoteS3"}).Debug(fmt.Sprintf("Trying to back up to %s/%s in S3 compatible remote storage", bucket, object))
 	if mc, err := minio.New(endpoint, accessKeyID, secretAccessKey, useSSL); err != nil {
@@ -81,12 +81,12 @@ func fromremoteS3() string {
 	cwd, _ := os.Getwd()
 	localarch := filepath.Join(cwd, based+".zip")
 	endpoint := brf.Creds.StorageTargetEndpoint
-	accessKeyID, secretAccessKey, bucket := extractS3cred()
+	accessKeyID, secretAccessKey, bucket, prefix := extractS3cred()
 	useSSL := true
 	if bucket == "" {
 		bucket = brf.InfraService + "-backup"
 	}
-	object := snapshotid
+	object := prefix + snapshotid
 
 	log.WithFields(log.Fields{"func": "fromremoteS3"}).Debug(fmt.Sprintf("Trying to retrieve %s/%s from S3 compatible remote storage", bucket, object))
 	if mc, err := minio.New(endpoint, accessKeyID, secretAccessKey, useSSL); err != nil {
